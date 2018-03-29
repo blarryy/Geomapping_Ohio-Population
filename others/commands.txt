@@ -1,0 +1,15 @@
+shp2json cb_2014_06_tract_500k.shp -o ohio.json
+
+shp2json cb_2014_39_tract_500k.shp -o ohio.json
+
+
+
+geoproject "d3.geoConicEqualArea().parallels([38 + 44 / 60, 40 + 2 / 60]).rotate([82 + 30 / 60, 0]).fitSize([960, 960], d)" < ohio.json > ohio-albers.json
+
+ndjson-split "d.features" < ohio-albers.json > ohio-albers.ndjson
+
+
+ndjson-map "d.id = d.properties.GEOID.slice(2), d" < ohio-albers.ndjson > ohio-albers-id.ndjson
+
+
+curl "http://api.census.gov/data/2014/acs5?get=B01003_001E&for=tract:*&in=state:39" -o cb_2014_39_tract_B01003.json
